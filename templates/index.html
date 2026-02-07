@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Collection Manager</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 My Movie Collection</h1>
+            <nav>
+                <a href="/add.html" class="btn btn-primary">+ Add Movie</a>
+                <a href="/stats.html" class="btn btn-secondary">📊 Stats</a>
+            </nav>
+        </header>
+
+        <!-- Filters -->
+        <div class="filters">
+            <select id="genreFilter">
+                <option value="">All Genres</option>
+            </select>
+
+            <select id="statusFilter">
+                <option value="">All Status</option>
+                <option value="Want to Watch">Want to Watch</option>
+                <option value="Watching">Watching</option>
+                <option value="Completed">Completed</option>
+            </select>
+
+            <button id="clearFilters" class="btn-link">Clear Filters</button>
+        </div>
+
+        <!-- Movies Grid -->
+        <div id="moviesGrid" class="movies-grid">
+            <!-- Movies will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Pagination controls will be inserted here dynamically -->
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

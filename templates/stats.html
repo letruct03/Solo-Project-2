@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - Movie Collection Manager</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Collection Statistics</h1>
+            <nav>
+                <a href="/" class="btn btn-secondary">← Back to Collection</a>
+            </nav>
+        </header>
+
+        <div class="stats-container">
+            <!-- Overview Stats -->
+            <div class="stats-section">
+                <h2>Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalMovies">0</div>
+                        <div class="stat-label">Total Movies</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="completedMovies">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="watchingMovies">0</div>
+                        <div class="stat-label">Currently Watching</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="wantToWatchMovies">0</div>
+                        <div class="stat-label">Want to Watch</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Movie Stats -->
+            <div class="stats-section">
+                <h2>Movie Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgRating">0</div>
+                        <div class="stat-label">Average Rating</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalRuntime">0</div>
+                        <div class="stat-label">Total Hours</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Genre Breakdown -->
+            <div class="stats-section">
+                <h2>Genre Breakdown</h2>
+                <div id="genreBreakdown" class="breakdown-list">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Year Breakdown -->
+            <div class="stats-section">
+                <h2>Release Year Distribution</h2>
+                <div id="yearBreakdown" class="breakdown-list">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            displayStats();
+        });
+        
+        async function displayStats() {
+            try {
+                const stats = await API.getStats();
+                
+                // Overview
+                document.getElementById('totalMovies').textContent = stats.total;
+                document.getElementById('completedMovies').textContent = stats.completed;
+                document.getElementById('watchingMovies').textContent = stats.watching;
+                document.getElementById('wantToWatchMovies').textContent = stats.wantToWatch;
+                
+                // Movie Stats
+                document.getElementById('avgRating').textContent = stats.averageRating || 'N/A';
+                const totalHours = Math.round(stats.totalRuntime / 60);
+                document.getElementById('totalRuntime').textContent = totalHours;
+                
+                // Genre Breakdown
+                const genreContainer = document.getElementById('genreBreakdown');
+                const genreEntries = Object.entries(stats.genreBreakdown).sort((a, b) => b[1] - a[1]);
+                
+                if (genreEntries.length === 0) {
+                    genreContainer.innerHTML = '<p>No genre data available</p>';
+                } else {
+                    genreContainer.innerHTML = genreEntries.map(([genre, count]) => {
+                        const percentage = ((count / stats.total) * 100).toFixed(1);
+                        return `
+                            <div class="breakdown-item">
+                                <div class="breakdown-info">
+                                    <span class="breakdown-label">${escapeHtml(genre)}</span>
+                                    <span class="breakdown-count">${count} movies (${percentage}%)</span>
+                                </div>
+                                <div class="breakdown-bar">
+                                    <div class="breakdown-bar-fill" style="width: ${percentage}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                // Year Breakdown
+                const yearContainer = document.getElementById('yearBreakdown');
+                const yearEntries = Object.entries(stats.yearBreakdown).sort((a, b) => b[0] - a[0]);
+                
+                if (yearEntries.length === 0) {
+                    yearContainer.innerHTML = '<p>No year data available</p>';
+                } else {
+                    yearContainer.innerHTML = yearEntries.map(([year, count]) => {
+                        const percentage = ((count / stats.total) * 100).toFixed(1);
+                        return `
+                            <div class="breakdown-item">
+                                <div class="breakdown-info">
+                                    <span class="breakdown-label">${year}</span>
+                                    <span class="breakdown-count">${count} movies (${percentage}%)</span>
+                                </div>
+                                <div class="breakdown-bar">
+                                    <div class="breakdown-bar-fill" style="width: ${percentage}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                alert('Failed to load statistics. Please try again.');
+            }
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
