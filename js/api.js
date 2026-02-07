@@ -1,6 +1,6 @@
 // api.js - API client for backend communication
 
-const API_BASE = window.location.origin + '/api';
+const API_BASE = '/.netlify/functions';
 
 const API = {
     /**

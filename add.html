@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Movie - Movie Collection Manager</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <title>Add Movie - Movie Collection Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Edit Movie</h1>
+            <h1>Add New Movie</h1>
             <nav>
                 <a href="/" class="btn btn-secondary">← Back to Collection</a>
             </nav>
@@ -17,7 +17,7 @@
 
         <div id="alertContainer"></div>
 
-        <form id="editMovieForm" class="movie-form">
+        <form id="addMovieForm" class="movie-form">
             <div class="form-group">
                 <label for="title">Title *</label>
                 <input type="text" id="title" name="title" required>
@@ -43,7 +43,8 @@
 
             <div class="form-group">
                 <label for="genre">Genre</label>
-                <input type="text" id="genre" name="genre">
+                <input type="text" id="genre" name="genre" 
+                       placeholder="e.g., Drama, Sci-Fi, Action">
             </div>
 
             <div class="form-row">
@@ -65,51 +66,20 @@
 
             <div class="form-group">
                 <label for="reviewNotes">Review / Notes</label>
-                <textarea id="reviewNotes" name="reviewNotes" rows="4"></textarea>
+                <textarea id="reviewNotes" name="reviewNotes" rows="4" 
+                          placeholder="Your thoughts about the movie..."></textarea>
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Update Movie</button>
+                <button type="submit" class="btn btn-primary">Add Movie</button>
                 <a href="/" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>
 
-    <script src="/static/js/api.js"></script>
+    <script src="/js/api.js"></script>
     <script>
-        // Get movie ID from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const movieId = urlParams.get('id');
-        
-        if (!movieId) {
-            window.location.href = '/';
-        }
-        
-        // Load movie data
-        async function loadMovie() {
-            try {
-                const movie = await API.getMovie(movieId);
-                
-                // Populate form with existing data
-                document.getElementById('title').value = movie.title || '';
-                document.getElementById('director').value = movie.director || '';
-                document.getElementById('releaseYear').value = movie.releaseYear || '';
-                document.getElementById('genre').value = movie.genre || '';
-                document.getElementById('runtime').value = movie.runtime || '';
-                document.getElementById('watchStatus').value = movie.watchStatus || 'Want to Watch';
-                document.getElementById('personalRating').value = movie.personalRating || '';
-                document.getElementById('reviewNotes').value = movie.reviewNotes || '';
-                
-            } catch (error) {
-                alert('Movie not found');
-                window.location.href = '/';
-            }
-        }
-        
-        loadMovie();
-        
-        // Handle form submission
-        document.getElementById('editMovieForm').addEventListener('submit', async function(e) {
+        document.getElementById('addMovieForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Get form data
@@ -132,10 +102,10 @@
             
             try {
                 // Submit to backend
-                await API.updateMovie(movieId, formData);
+                await API.createMovie(formData);
                 
                 // Show success and redirect
-                showAlert('Movie updated successfully!', 'success');
+                showAlert('Movie added successfully!', 'success');
                 setTimeout(() => {
                     window.location.href = '/';
                 }, 1000);
