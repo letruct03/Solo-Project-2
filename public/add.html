@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Movie - Movie Collection Manager</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Add New Movie</h1>
             <nav>
-                <a href="/" class="btn btn-secondary">← Back to Collection</a>
+                <a href="index.html" class="btn btn-secondary">← Back to Collection</a>
             </nav>
         </header>
 
@@ -71,47 +71,50 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Add Movie</button>
-                <a href="/" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Add Movie</button>
+                <a href="index.html" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>
 
-    <script src="/static/js/api.js"></script>
+    <script src="js/api.js"></script>
     <script>
         document.getElementById('addMovieForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Adding...';
             
             // Get form data
             const formData = {
                 title: document.getElementById('title').value.trim(),
                 director: document.getElementById('director').value.trim(),
-                releaseYear: document.getElementById('releaseYear').value || null,
+                releaseYear: document.getElementById('releaseYear').value ? parseInt(document.getElementById('releaseYear').value) : null,
                 genre: document.getElementById('genre').value.trim(),
-                runtime: document.getElementById('runtime').value || null,
+                runtime: document.getElementById('runtime').value ? parseInt(document.getElementById('runtime').value) : null,
                 watchStatus: document.getElementById('watchStatus').value,
-                personalRating: document.getElementById('personalRating').value || null,
+                personalRating: document.getElementById('personalRating').value ? parseFloat(document.getElementById('personalRating').value) : null,
                 reviewNotes: document.getElementById('reviewNotes').value.trim()
             };
             
-            // Client-side validation
-            if (!formData.title) {
-                showAlert('Title is required', 'error');
-                return;
-            }
-            
             try {
-                // Submit to backend
-                await API.createMovie(formData);
+                const result = await API.createMovie(formData);
                 
-                // Show success and redirect
-                showAlert('Movie added successfully!', 'success');
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 1000);
-                
+                if (result.success) {
+                    showAlert('Movie added successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showAlert(result.error || 'Failed to add movie', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Add Movie';
+                }
             } catch (error) {
-                showAlert(error.message, 'error');
+                showAlert('Error: ' + error.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Add Movie';
             }
         });
         
@@ -124,7 +127,9 @@
             `;
             
             setTimeout(() => {
-                alertContainer.innerHTML = '';
+                if (type === 'error') {
+                    alertContainer.innerHTML = '';
+                }
             }, 5000);
         }
     </script>
