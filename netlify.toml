@@ -1,24 +1,15 @@
-# Netlify Configuration for Movie Collection Manager
-
 [build]
-  # Publish directory
   publish = "public"
-  
-  # No build command needed for static site
   command = ""
 
-[build.environment]
-  PHP_VERSION = "8.2"
+[functions]
+  directory = "netlify/functions"
 
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api?path=:splat"
   status = 200
-
-[functions]
-  # Enable PHP runtime
-  external_node_modules = []
-  node_bundler = "esbuild"
+  force = true
 
 [[headers]]
   for = "/*"
@@ -26,3 +17,4 @@
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type"
+    
